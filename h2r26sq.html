@@ -202,7 +202,7 @@
         console.log("About / Docs clicked - to be expanded later");
       });
 
-      // Close menu when clicking outside
+      // CLOSE MENU: Click outside menu
       document.addEventListener('pointerdown', (e) => {
         if (menuVisible && !document.getElementById('menu').contains(e.target)) {
           hideMenu();
@@ -210,7 +210,7 @@
       });
 
       // --------------------------------------------------------------
-      // CANVAS EVENT HANDLING (Cross-platform pointer events)
+      // CANVAS EVENT HANDLING
       // --------------------------------------------------------------
       canvasEl = document.querySelector('canvas');
 
@@ -300,8 +300,9 @@
         document.getElementById('footer').style.color = newFooterColor;
       }
 
+      // FIXED: Only toggle background when menu is NOT visible
       document.addEventListener('pointerdown', (e) => {
-        if (e.target !== canvasEl && !document.getElementById('menu').contains(e.target)) {
+        if (e.target !== canvasEl && !document.getElementById('menu').contains(e.target) && !menuVisible) {
           toggleOuterBackground();
         }
       });
@@ -579,7 +580,7 @@
         }
       }
 
-      // 3. Draw using GPU-accelerated rectangles
+      // 3. Draw using GPU-accelerated rectangles (Optimized fill)
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           let baseX = floor(c * w_float);
@@ -606,7 +607,8 @@
               let finalG = constrain(col[1] + shift, 0, 255);
               let finalB = constrain(col[2] + shift, 0, 255);
 
-              fill(color(finalR, finalG, finalB));
+              // OPTIMIZATION: Bypass p5.Color object creation
+              fill(finalR, finalG, finalB);
               noStroke();
               rect(x, y, cw, ch);
             }
