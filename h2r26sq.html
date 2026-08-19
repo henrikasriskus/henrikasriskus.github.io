@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>H2R26SQ</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a14;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      transition: background 0.2s ease;
+    }
+    canvas {
+      display: block;
+      cursor: pointer;
+      touch-action: none;
+      position: absolute;
+    }
+    
+    #footer {
+      position: absolute;
+      bottom: 8%;
+      width: 100%;
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      pointer-events: none;
+      letter-spacing: 0.5px;
+      font-weight: 400;
+      transition: color 0.2s ease;
+    }
+
+    #menu {
+      display: none;
+      position: absolute;
+      background: rgba(22, 22, 35, 0.96);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 14px;
+      padding: 8px 0;
+      min-width: 220px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.8);
+      z-index: 999;
+      pointer-events: auto;
+    }
+    #menu .menu-header {
+      padding: 8px 20px 4px 20px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 4px;
+    }
+    #menu .menu-status {
+      padding: 6px 20px 10px 20px;
+      color: #999;
+      font-size: 13px;
+      line-height: 1.6;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 4px;
+    }
+    #menu .menu-status span { display: block; }
+    #menu button {
+      display: block;
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #eee;
+      padding: 10px 20px;
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s;
+      letter-spacing: 0.3px;
+      pointer-events: auto;
+      touch-action: manipulation;
+    }
+    #menu button:hover { background: rgba(255,255,255,0.08); }
+    #menu hr {
+      border: 0;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      margin: 4px 12px;
+    }
+    #menu .footer-link {
+      color: #666;
+      font-size: 12px;
+      padding: 12px 20px 8px 20px;
+      cursor: default;
+    }
+    #menu .footer-link:hover { color: #aaa; }
+  </style>
+</head>
+<body>
+
+  <div id="footer">© 2026 Henrikas Riškus</div>
+
+  <div id="menu">
+    <div class="menu-header">H2R26SQ</div>
+    <div class="menu-status">
+      <span id="menuModule">Module: Chess</span>
+      <span id="menuMode">Mode: B&W</span>
+      <span id="menuSpeed">Speed: Stop</span>
+    </div>
+    
+    <button id="saveBtn">💾 Save Image</button>
+    <button id="gridBtn">🔲 Grid: ON</button>
+    <button id="textureBtn">🎛️ Texture: OFF</button>
+    
+    <hr>
+    <div class="footer-link" id="aboutBtn">📄 About / Docs (coming soon)</div>
+  </div>
+
+  <script>
+    // --------------------------------------------------------------
+    // STATE
+    // --------------------------------------------------------------
+    let currentModule = 0;
+    let colorMode = 'bw';
+    let currentSpeed = 0;
+    let showGrid = true;
+    let textureOn = false;
+    let outerBgIsWhite = false;
+
+    const speedNames = ['Stop', 'Super 8f/s', '2 sec/frame', '20 sec/frame'];
+    const speedMs = [0, 125, 2000, 20000];
+    const moduleNames = ['Chess', 'Symmetrical 14×14', 'Hybrid 7×7', 'Fractal 64×64'];
+    
+    let menuVisible = false;
+    let animationInterval = null;
+    let animFrameCounter = 0;
+
+    // Input handling variables
+    let pressTimer = null;
+    let isCanvasPressed = false;
+    let canvasX = 0, canvasY = 0;
+    let canvasEl = null;
+
+    let storedGrid = [];
+    let storedRows = 0;
+    let storedCols = 0;
+
+    // Texture seeds (changes per composition)
+    let textureSeedX = 100;
+    let textureSeedY = 100;
+
+    // --------------------------------------------------------------
+    // P5 SETUP
+    // --------------------------------------------------------------
+    function setup() {
+      let canvasW = floor(windowWidth * 0.7);
+      let canvasH = floor(windowHeight * 0.7);
+      
+      let c = createCanvas(canvasW, canvasH);
+      c.style('left', '15%');
+      c.style('top', '12%');
+      
+      noLoop();
+      generateNewComposition();
+
+      document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+      // Menu buttons
+      document.getElementById('saveBtn').addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        let canvasElement = document.querySelector('canvas');
+        if (canvasElement) {
+          let link = document.createElement('a');
+          link.download = 'H2R26SQ_pattern.png';
+          link.href = canvasElement.toDataURL('image/png');
+          link.click();
+        }
+        hideMenu();
+      });
+
+      document.getElementById('gridBtn').addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        showGrid = !showGrid;
+        document.getElementById('gridBtn').innerText = '🔲 Grid: ' + (showGrid ? 'ON' : 'OFF');
+        renderCurrentComposition();
+        hideMenu();
+      });
+
+      document.getElementById('textureBtn').addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        textureOn = !textureOn;
+        document.getElementById('textureBtn').innerText = '🎛️ Texture: ' + (textureOn ? 'ON' : 'OFF');
+        renderCurrentComposition();
+        hideMenu();
+      });
+
+      document.getElementById('aboutBtn').addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        hideMenu();
+        console.log("About / Docs clicked - to be expanded later");
+      });
+
+      // Close menu when clicking outside
+      document.addEventListener('pointerdown', (e) => {
+        if (menuVisible && !document.getElementById('menu').contains(e.target)) {
+          hideMenu();
+        }
+      });
+
+      // --------------------------------------------------------------
+      // CANVAS EVENT HANDLING (Cross-platform pointer events)
+      // --------------------------------------------------------------
+      canvasEl = document.querySelector('canvas');
+
+      // Desktop Right-click
+      canvasEl.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        let rect = canvasEl.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+        showMenu(x, y);
+      });
+
+      // Pointer down (Left click / Touch start)
+      canvasEl.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0) return;
+        if (menuVisible) return;
+
+        let rect = canvasEl.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+        canvasX = x;
+        canvasY = y;
+        isCanvasPressed = true;
+
+        if (pressTimer) {
+          clearTimeout(pressTimer);
+          pressTimer = null;
+        }
+
+        // 600ms hold to open menu
+        pressTimer = setTimeout(() => {
+          showMenu(x, y);
+          pressTimer = null;
+          isCanvasPressed = false;
+        }, 600);
+      });
+
+      // Pointer up (Left click release / Touch end)
+      canvasEl.addEventListener('pointerup', (e) => {
+        if (e.button !== 0) return;
+        if (!isCanvasPressed) return;
+
+        if (pressTimer) {
+          clearTimeout(pressTimer);
+          pressTimer = null;
+        }
+        isCanvasPressed = false;
+
+        // If menu didn't open, execute quadrant action
+        if (!menuVisible) {
+          executeQuadrantAction(canvasX, canvasY);
+        }
+      });
+
+      // Cancel if pointer leaves canvas or moves too much (drag)
+      canvasEl.addEventListener('pointerleave', () => {
+        if (pressTimer) {
+          clearTimeout(pressTimer);
+          pressTimer = null;
+        }
+        isCanvasPressed = false;
+      });
+
+      canvasEl.addEventListener('pointermove', (e) => {
+        if (isCanvasPressed) {
+          let rect = canvasEl.getBoundingClientRect();
+          let dx = e.clientX - rect.left - canvasX;
+          let dy = e.clientY - rect.top - canvasY;
+          if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+            if (pressTimer) {
+              clearTimeout(pressTimer);
+              pressTimer = null;
+            }
+            isCanvasPressed = false;
+          }
+        }
+      });
+
+      // --------------------------------------------------------------
+      // OUTSIDE CANVAS CLICK -> TOGGLE BACKGROUND
+      // --------------------------------------------------------------
+      function toggleOuterBackground() {
+        outerBgIsWhite = !outerBgIsWhite;
+        const newBg = outerBgIsWhite ? '#ffffff' : '#000000';
+        const newFooterColor = outerBgIsWhite ? '#444444' : '#888888';
+        document.body.style.backgroundColor = newBg;
+        document.getElementById('footer').style.color = newFooterColor;
+      }
+
+      document.addEventListener('pointerdown', (e) => {
+        if (e.target !== canvasEl && !document.getElementById('menu').contains(e.target)) {
+          toggleOuterBackground();
+        }
+      });
+
+      updateMenuStatus();
+    }
+
+    // Prevent p5 from stealing pointer events
+    function mousePressed() { return false; }
+    function mouseReleased() { return false; }
+    function mouseDragged() { return false; }
+    function touchStarted() { return false; }
+    function touchEnded() { return false; }
+
+    function windowResized() {
+      let newW = floor(windowWidth * 0.7);
+      let newH = floor(windowHeight * 0.7);
+      resizeCanvas(newW, newH);
+      renderCurrentComposition();
+    }
+
+    // --------------------------------------------------------------
+    // QUADRANT ACTION
+    // --------------------------------------------------------------
+    function executeQuadrantAction(x, y) {
+      if (menuVisible) return;
+      let w = width, h = height;
+      if (x < w/2 && y < h/2) generateNewComposition();        // Top-Left
+      else if (x > w/2 && y < h/2) toggleColorMode();          // Top-Right
+      else if (x < w/2 && y > h/2) cycleSpeed();               // Bottom-Left
+      else if (x > w/2 && y > h/2) cycleModule();              // Bottom-Right
+    }
+
+    // --------------------------------------------------------------
+    // CORE FUNCTIONS
+    // --------------------------------------------------------------
+    function generateNewComposition() {
+      // Update random seeds so the Texture changes with every generation
+      textureSeedX = random(1000);
+      textureSeedY = random(1000);
+
+      if (currentModule === 0) { // Chess 8x8
+        storedRows = 8; storedCols = 8;
+        storedGrid = [];
+        for (let r = 0; r < storedRows; r++) {
+          storedGrid[r] = [];
+          for (let c = 0; c < storedCols; c++) {
+            storedGrid[r][c] = random() > 0.5 ? 1 : 0;
+          }
+        }
+      } else if (currentModule === 1) { // Symmetrical 14x14
+        storedRows = 14; storedCols = 14;
+        storedGrid = Array.from({ length: 14 }, () => Array(14).fill(0));
+        for (let r = 3; r <= 10; r++) for (let c = 3; c <= 10; c++) storedGrid[r][c] = random() > 0.5 ? 1 : 0;
+        for (let r = 0; r <= 2; r++) for (let c = 0; c < 14; c++) storedGrid[r][c] = storedGrid[6 - r][c];
+        for (let r = 11; r <= 13; r++) for (let c = 0; c < 14; c++) storedGrid[r][c] = storedGrid[20 - r][c];
+        for (let r = 0; r < 14; r++) for (let c = 0; c <= 2; c++) storedGrid[r][c] = storedGrid[r][6 - c];
+        for (let r = 0; r < 14; r++) for (let c = 11; c <= 13; c++) storedGrid[r][c] = storedGrid[r][20 - c];
+      } else if (currentModule === 2) { // Hybrid 7x7
+        const blockCount = 7, blockSize = 7;
+        storedRows = blockCount * blockSize; storedCols = blockCount * blockSize;
+        storedGrid = Array.from({ length: storedRows }, () => Array(storedCols).fill(0));
+        for (let bx = 0; bx < blockCount; bx++) {
+          for (let by = 0; by < blockCount; by++) {
+            const isSymmetric = random() > 0.5;
+            let block = Array.from({ length: blockSize }, () => Array(blockSize).fill(0));
+            if (isSymmetric) {
+              const half = Math.ceil(blockSize / 2);
+              for (let i = 0; i < half; i++) {
+                for (let j = 0; j < half; j++) {
+                  const val = random() > 0.5 ? 1 : 0;
+                  block[i][j] = val; block[blockSize-1-i][j] = val;
+                  block[i][blockSize-1-j] = val; block[blockSize-1-i][blockSize-1-j] = val;
+                }
+              }
+            } else {
+              for (let i = 0; i < blockSize; i++) for (let j = 0; j < blockSize; j++) block[i][j] = random() > 0.5 ? 1 : 0;
+            }
+            for (let i = 0; i < blockSize; i++) for (let j = 0; j < blockSize; j++) {
+              storedGrid[bx * blockSize + i][by * blockSize + j] = block[i][j];
+            }
+          }
+        }
+      } else if (currentModule === 3) { // Fractal 64x64
+        storedRows = 64; storedCols = 64;
+        storedGrid = Array.from({ length: storedRows }, () => Array(storedCols).fill(0));
+        
+        let seed = Array.from({ length: 8 }, () => Array(8).fill(0));
+        for (let r = 0; r < 8; r++) {
+          for (let c = 0; c < 8; c++) {
+            seed[r][c] = random() > 0.5 ? 1 : 0;
+          }
+        }
+        
+        for (let sr = 0; sr < 8; sr++) {
+          for (let sc = 0; sc < 8; sc++) {
+            let isWhite = seed[sr][sc] === 1;
+            for (let r = 0; r < 8; r++) {
+              for (let c = 0; c < 8; c++) {
+                let val = seed[r][c];
+                if (isWhite) val = 1 - val;
+                storedGrid[sr * 8 + r][sc * 8 + c] = val;
+              }
+            }
+          }
+        }
+      }
+      renderCurrentComposition();
+      updateMenuStatus();
+    }
+
+    function toggleColorMode() {
+      colorMode = (colorMode === 'bw') ? 'grouped' : 'bw';
+      renderCurrentComposition();
+      updateMenuStatus();
+      if (currentSpeed !== 0) startAnimation();
+    }
+
+    function cycleModule() {
+      currentModule = (currentModule + 1) % moduleNames.length;
+      generateNewComposition();
+    }
+
+    function cycleSpeed() {
+      currentSpeed = (currentSpeed + 1) % speedMs.length;
+      startAnimation();
+      updateMenuStatus();
+    }
+
+    function startAnimation() {
+      if (animationInterval) { clearInterval(animationInterval); animationInterval = null; }
+      if (currentSpeed === 0) return;
+      
+      animFrameCounter = 0;
+      animationInterval = setInterval(() => {
+        animFrameCounter++;
+        
+        if (currentSpeed === 1 && colorMode === 'grouped') {
+          if (animFrameCounter % 2 === 1) {
+            generateNewComposition();
+          } else {
+            renderCurrentComposition();
+          }
+        } else {
+          generateNewComposition();
+        }
+      }, speedMs[currentSpeed]);
+    }
+
+    // --------------------------------------------------------------
+    // RENDER (GPU-Accelerated Texture)
+    // --------------------------------------------------------------
+    function renderCurrentComposition() {
+      if (storedRows === 0 || storedCols === 0) return;
+      let rows = storedRows, cols = storedCols;
+      let w_float = width / cols, h_float = height / rows;
+      background(10, 10, 20);
+
+      // ------------- FAST PATH: No Texture -------------
+      if (!textureOn) {
+        if (colorMode === 'bw') {
+          for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+              let x = floor(c * w_float);
+              let y = floor(r * h_float);
+              let cw = floor((c + 1) * w_float) - x;
+              let ch = floor((r + 1) * h_float) - y;
+              let val = storedGrid[r][c];
+              fill(val === 0 ? 10 : 255);
+              noStroke();
+              rect(x, y, cw, ch);
+              if (showGrid) { stroke(60,60,80,120); strokeWeight(1); noFill(); rect(x, y, cw, ch); }
+            }
+          }
+        } else {
+          let visited = Array.from({ length: rows }, () => Array(cols).fill(false));
+          let cellColors = Array.from({ length: rows }, () => Array(cols).fill(null));
+          for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+              if (!visited[r][c]) {
+                let val = storedGrid[r][c];
+                let groupColor = color(random(255), random(255), random(255), 220);
+                let stack = [[r, c]];
+                visited[r][c] = true;
+                while (stack.length > 0) {
+                  let [cr, cc] = stack.pop();
+                  cellColors[cr][cc] = groupColor;
+                  let neighbors = [[cr-1, cc], [cr+1, cc], [cr, cc-1], [cr, cc+1]];
+                  for (let [nr, nc] of neighbors) {
+                    if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && !visited[nr][nc] && storedGrid[nr][nc] === val) {
+                      visited[nr][nc] = true;
+                      stack.push([nr, nc]);
+                    }
+                  }
+                }
+              }
+            }
+          }
+          for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+              let x = floor(c * w_float);
+              let y = floor(r * h_float);
+              let cw = floor((c + 1) * w_float) - x;
+              let ch = floor((r + 1) * h_float) - y;
+              fill(cellColors[r][c]);
+              noStroke();
+              rect(x, y, cw, ch);
+            }
+          }
+          if (showGrid) {
+            for (let r = 0; r < rows; r++) {
+              for (let c = 0; c < cols; c++) {
+                let x = floor(c * w_float);
+                let y = floor(r * h_float);
+                let cw = floor((c + 1) * w_float) - x;
+                let ch = floor((r + 1) * h_float) - y;
+                stroke(60, 60, 80, 120);
+                strokeWeight(1);
+                noFill();
+                rect(x, y, cw, ch);
+              }
+            }
+          }
+        }
+        redraw();
+        return;
+      }
+
+      // ------------- ULTRA FAST TEXTURE PATH (GPU Rectangles + Precomputed Noise) -------------
+      let blockSize = 8;
+      let intensity = 52;
+      let noiseScale = 0.3;
+
+      // 1. Precompute Base Colors for the Grid (BW or Grouped)
+      let baseColors = Array.from({ length: rows }, () => Array(cols).fill(null));
+      if (colorMode === 'bw') {
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            let b = storedGrid[r][c] === 0 ? 10 : 255;
+            baseColors[r][c] = [b, b, b];
+          }
+        }
+      } else {
+        let visited = Array.from({ length: rows }, () => Array(cols).fill(false));
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            if (!visited[r][c]) {
+              let val = storedGrid[r][c];
+              let groupColor = color(random(255), random(255), random(255), 220);
+              let stack = [[r, c]];
+              visited[r][c] = true;
+              while (stack.length > 0) {
+                let [cr, cc] = stack.pop();
+                baseColors[cr][cc] = [red(groupColor), green(groupColor), blue(groupColor)];
+                let neighbors = [[cr-1, cc], [cr+1, cc], [cr, cc-1], [cr, cc+1]];
+                for (let [nr, nc] of neighbors) {
+                  if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && !visited[nr][nc] && storedGrid[nr][nc] === val) {
+                    visited[nr][nc] = true;
+                    stack.push([nr, nc]);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // 2. Precompute Noise Map once per frame (using the composition's seed)
+      let numNoiseX = ceil(width / blockSize) + 1;
+      let numNoiseY = ceil(height / blockSize) + 1;
+      let noiseMap = Array.from({ length: numNoiseY }, () => Array(numNoiseX).fill(0));
+      for (let ny = 0; ny < numNoiseY; ny++) {
+        for (let nx = 0; nx < numNoiseX; nx++) {
+          noiseMap[ny][nx] = noise(nx * noiseScale + textureSeedX, ny * noiseScale + textureSeedY);
+        }
+      }
+
+      // 3. Draw using GPU-accelerated rectangles
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          let baseX = floor(c * w_float);
+          let baseY = floor(r * h_float);
+          let cellW = floor((c + 1) * w_float) - baseX;
+          let cellH = floor((r + 1) * h_float) - baseY;
+          let subW = cellW / blockSize;
+          let subH = cellH / blockSize;
+          let col = baseColors[r][c];
+
+          for (let sr = 0; sr < blockSize; sr++) {
+            for (let sc = 0; sc < blockSize; sc++) {
+              let x = floor(baseX + sc * subW);
+              let y = floor(baseY + sr * subH);
+              let cw = floor(baseX + (sc + 1) * subW) - x;
+              let ch = floor(baseY + (sr + 1) * subH) - y;
+
+              let nx = floor(x / blockSize);
+              let ny = floor(y / blockSize);
+              let dVal = noiseMap[ny][nx];
+              let shift = (dVal - 0.5) * intensity;
+
+              let finalR = constrain(col[0] + shift, 0, 255);
+              let finalG = constrain(col[1] + shift, 0, 255);
+              let finalB = constrain(col[2] + shift, 0, 255);
+
+              fill(color(finalR, finalG, finalB));
+              noStroke();
+              rect(x, y, cw, ch);
+            }
+          }
+        }
+      }
+
+      // 4. Draw grid lines on top if enabled
+      if (showGrid) {
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            let x = floor(c * w_float);
+            let y = floor(r * h_float);
+            let cw = floor((c + 1) * w_float) - x;
+            let ch = floor((r + 1) * h_float) - y;
+            stroke(60, 60, 80, 120);
+            strokeWeight(1);
+            noFill();
+            rect(x, y, cw, ch);
+          }
+        }
+      }
+      redraw();
+    }
+
+    function draw() {} 
+
+    // --------------------------------------------------------------
+    // MENU STATUS & VISIBILITY
+    // --------------------------------------------------------------
+    function updateMenuStatus() {
+      document.getElementById('menuModule').innerText = 'Module: ' + moduleNames[currentModule];
+      document.getElementById('menuMode').innerText = 'Mode: ' + (colorMode === 'bw' ? 'B&W' : 'Grouped');
+      document.getElementById('menuSpeed').innerText = 'Speed: ' + speedNames[currentSpeed];
+      document.getElementById('textureBtn').innerText = '🎛️ Texture: ' + (textureOn ? 'ON' : 'OFF');
+      document.getElementById('gridBtn').innerText = '🔲 Grid: ' + (showGrid ? 'ON' : 'OFF');
+    }
+
+    function showMenu(x, y) {
+      const menu = document.getElementById('menu');
+      const menuWidth = 230, menuHeight = 300;
+      
+      let offsetX = windowWidth * 0.15;
+      let offsetY = windowHeight * 0.12;
+      let globalX = offsetX + x;
+      let globalY = offsetY + y;
+
+      const safeX = Math.max(10, Math.min(globalX, window.innerWidth - menuWidth - 10));
+      const safeY = Math.max(10, Math.min(globalY, window.innerHeight - menuHeight - 10));
+      menu.style.left = safeX + 'px';
+      menu.style.top = safeY + 'px';
+      menu.style.display = 'block';
+      menuVisible = true;
+    }
+
+    function hideMenu() {
+      document.getElementById('menu').style.display = 'none';
+      menuVisible = false;
+    }
+  </script>
+</body>
+</html>
