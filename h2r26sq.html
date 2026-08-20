@@ -105,13 +105,13 @@
   <div id="menu">
     <div class="menu-header">H2R26SQ</div>
     <div class="menu-status">
-      <span id="menuModule">Module: Chess</span>
+      <span id="menuModule">Module: Chess 8 x 8</span>
       <span id="menuMode">Mode: B&W</span>
       <span id="menuSpeed">Speed: Stop</span>
     </div>
     
     <button id="saveBtn">💾 Save Image</button>
-    <button id="gridBtn">🔲 Grid: ON</button>
+    <button id="gridBtn">🔲 Grid: OFF</button>
     <button id="textureBtn">🎛️ Texture: OFF</button>
     
     <hr>
@@ -125,13 +125,14 @@
     let currentModule = 0;
     let colorMode = 'bw';
     let currentSpeed = 0;
-    let showGrid = true;
-    let textureOn = false;
+    let showGrid = false;    // Default: OFF
+    let textureOn = false;   // Default: OFF
     let outerBgIsWhite = false;
 
     const speedNames = ['Stop', 'Super 8f/s', '2 sec/frame', '20 sec/frame'];
     const speedMs = [0, 125, 2000, 20000];
-    const moduleNames = ['Chess', 'Symmetrical 14×14', 'Hybrid 7×7', 'Fractal 64×64'];
+    // UPDATED MODULE NAMES
+    const moduleNames = ['Chess 8 x 8', 'Symmetry 14 x 14', 'Hybrid 49 x 49', 'Fractal 64 x 64'];
     
     let menuVisible = false;
     let animationInterval = null;
@@ -300,7 +301,6 @@
         document.getElementById('footer').style.color = newFooterColor;
       }
 
-      // FIXED: Only toggle background when menu is NOT visible
       document.addEventListener('pointerdown', (e) => {
         if (e.target !== canvasEl && !document.getElementById('menu').contains(e.target) && !menuVisible) {
           toggleOuterBackground();
@@ -344,7 +344,7 @@
       textureSeedX = random(1000);
       textureSeedY = random(1000);
 
-      if (currentModule === 0) { // Chess 8x8
+      if (currentModule === 0) { // Chess 8 x 8
         storedRows = 8; storedCols = 8;
         storedGrid = [];
         for (let r = 0; r < storedRows; r++) {
@@ -353,7 +353,7 @@
             storedGrid[r][c] = random() > 0.5 ? 1 : 0;
           }
         }
-      } else if (currentModule === 1) { // Symmetrical 14x14
+      } else if (currentModule === 1) { // Symmetry 14 x 14
         storedRows = 14; storedCols = 14;
         storedGrid = Array.from({ length: 14 }, () => Array(14).fill(0));
         for (let r = 3; r <= 10; r++) for (let c = 3; c <= 10; c++) storedGrid[r][c] = random() > 0.5 ? 1 : 0;
@@ -361,7 +361,7 @@
         for (let r = 11; r <= 13; r++) for (let c = 0; c < 14; c++) storedGrid[r][c] = storedGrid[20 - r][c];
         for (let r = 0; r < 14; r++) for (let c = 0; c <= 2; c++) storedGrid[r][c] = storedGrid[r][6 - c];
         for (let r = 0; r < 14; r++) for (let c = 11; c <= 13; c++) storedGrid[r][c] = storedGrid[r][20 - c];
-      } else if (currentModule === 2) { // Hybrid 7x7
+      } else if (currentModule === 2) { // Hybrid 49 x 49
         const blockCount = 7, blockSize = 7;
         storedRows = blockCount * blockSize; storedCols = blockCount * blockSize;
         storedGrid = Array.from({ length: storedRows }, () => Array(storedCols).fill(0));
@@ -386,7 +386,7 @@
             }
           }
         }
-      } else if (currentModule === 3) { // Fractal 64x64
+      } else if (currentModule === 3) { // Fractal 64 x 64
         storedRows = 64; storedCols = 64;
         storedGrid = Array.from({ length: storedRows }, () => Array(storedCols).fill(0));
         
@@ -459,7 +459,7 @@
       if (storedRows === 0 || storedCols === 0) return;
       let rows = storedRows, cols = storedCols;
       let w_float = width / cols, h_float = height / rows;
-      background(10, 10, 20);
+      background(10, 10, 20); // RGB(10, 10, 20) = #0a0a14 (perfect match to body)
 
       // ------------- FAST PATH: No Texture -------------
       if (!textureOn) {
@@ -471,10 +471,13 @@
               let cw = floor((c + 1) * w_float) - x;
               let ch = floor((r + 1) * h_float) - y;
               let val = storedGrid[r][c];
-              fill(val === 0 ? 10 : 255);
+              // MATCHED BLACK: Exactly RGB(10, 10, 20) to match canvas background
+              if (val === 0) fill(10, 10, 20);
+              else fill(255);
               noStroke();
               rect(x, y, cw, ch);
-              if (showGrid) { stroke(60,60,80,120); strokeWeight(1); noFill(); rect(x, y, cw, ch); }
+              // UPDATED GRID COLOR: Same grey as footer text (#888) with slight alpha
+              if (showGrid) { stroke(136, 136, 136, 160); strokeWeight(1); noFill(); rect(x, y, cw, ch); }
             }
           }
         } else {
@@ -519,7 +522,7 @@
                 let y = floor(r * h_float);
                 let cw = floor((c + 1) * w_float) - x;
                 let ch = floor((r + 1) * h_float) - y;
-                stroke(60, 60, 80, 120);
+                stroke(136, 136, 136, 160); // Updated grid color
                 strokeWeight(1);
                 noFill();
                 rect(x, y, cw, ch);
@@ -541,8 +544,9 @@
       if (colorMode === 'bw') {
         for (let r = 0; r < rows; r++) {
           for (let c = 0; c < cols; c++) {
-            let b = storedGrid[r][c] === 0 ? 10 : 255;
-            baseColors[r][c] = [b, b, b];
+            // MATCHED BLACK: Use [10, 10, 20] for empty cells to match the canvas background
+            let b = storedGrid[r][c] === 0 ? [10, 10, 20] : [255, 255, 255];
+            baseColors[r][c] = b;
           }
         }
       } else {
@@ -607,7 +611,7 @@
               let finalG = constrain(col[1] + shift, 0, 255);
               let finalB = constrain(col[2] + shift, 0, 255);
 
-              // OPTIMIZATION: Bypass p5.Color object creation
+              // Bypass p5.Color object creation for speed
               fill(finalR, finalG, finalB);
               noStroke();
               rect(x, y, cw, ch);
@@ -624,7 +628,7 @@
             let y = floor(r * h_float);
             let cw = floor((c + 1) * w_float) - x;
             let ch = floor((r + 1) * h_float) - y;
-            stroke(60, 60, 80, 120);
+            stroke(136, 136, 136, 160); // Updated grid color
             strokeWeight(1);
             noFill();
             rect(x, y, cw, ch);
