@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ZONA AUTÓNOMA // THE SANCTUARY MAP</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Rubik+Glitch&family=Rubik+Wet+Paint&family=Cormorant+Garamond:ital,wght@1,400;1,700&display=swap');
+
+:root {
+--bg: #020202;
+--acid: #CCFF00;
+--pink: #FF2A6D;
+--blue: #00F0FF;
+--orange: #FF8C00;
+--green: #39FF14;
+--yellow: #FFE600;
+--white: #FFFFFF;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+
+body {
+background-color: var(--bg);
+color: var(--white);
+font-family: 'Space Mono', monospace;
+overflow: hidden;
+cursor: crosshair;
+touch-action: none;
+height: 100vh;
+width: 100vw;
+}
+
+body::before {
+content: "";
+position: fixed;
+top: 0; left: 0; width: 100vw; height: 100vh;
+background-image:
+repeating-linear-gradient(0deg, rgba(0,0,0,0.8) 0px, rgba(0,0,0,0.8) 2px, transparent 2px, transparent 4px),
+url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E");
+pointer-events: none;
+z-index: 9999;
+animation: static-jitter 0.2s infinite;
+}
+
+body::after {
+content: "";
+position: fixed;
+top: 0; left: 0; width: 100vw; height: 100vh;
+background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.95) 100%);
+pointer-events: none;
+z-index: 9998;
+}
+
+#environment {
+position: absolute;
+width: 2400px;
+height: 2400px;
+top: 0;
+left: 0;
+background-color: var(--bg);
+background-image:
+repeating-conic-gradient(from 0deg at 50% 50%, rgba(57, 255, 20, 0.06) 0deg, rgba(57, 255, 20, 0.06) 2deg, transparent 2deg, transparent 15deg),
+repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 70px, rgba(0, 240, 255, 0.08) 70px, rgba(0, 240, 255, 0.08) 72px),
+repeating-linear-gradient(0deg, transparent 0, transparent 99px, rgba(0, 240, 255, 0.15) 99px, rgba(0, 240, 255, 0.15) 100px),
+repeating-linear-gradient(90deg, transparent 0, transparent 99px, rgba(0, 240, 255, 0.15) 99px, rgba(0, 240, 255, 0.15) 100px),
+radial-gradient(circle at 50% 50%, #1a2b1a 0%, #000000 80%);
+will-change: transform;
+z-index: 10;
+}
+
+/* THE 7 INFOMATIONAL GEOMETRY NODES */
+.geo-node {
+position: absolute;
+width: 450px;
+height: 450px;
+mix-blend-mode: screen;
+filter: drop-shadow(0 0 30px var(--green));
+z-index: 20;
+opacity: 0.8;
+animation: node-pulse 6s ease-in-out infinite;
+pointer-events: auto;
+cursor: pointer;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+@keyframes node-pulse {
+0%, 100% { transform: scale(0.95); opacity: 0.7; }
+50% { transform: scale(1.05); opacity: 1; }
+}
+
+.geo-node svg {
+position: absolute;
+inset: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+}
+
+.data-shard {
+position: absolute;
+width: 350px;
+padding: 30px;
+background: rgba(0, 0, 0, 0.98);
+border: 2px solid var(--acid);
+border-left: 10px solid var(--pink);
+box-shadow: 0 0 40px rgba(255, 42, 109, 0.3);
+opacity: 0;
+transform: translateY(50px) scale(0.8);
+transition: opacity 0.5s, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s, color 0.3s, width 0.3s;
+pointer-events: none;
+z-index: 30;
+backdrop-filter: blur(5px);
+}
+
+.geo-node.proximity .data-shard {
+opacity: 1;
+transform: translateY(0) scale(1);
+pointer-events: auto;
+cursor: pointer;
+}
+
+.data-shard h3 {
+font-family: 'Anton', sans-serif;
+font-size: 50px;
+margin-bottom: 15px;
+color: var(--acid);
+text-shadow: 3px 3px 0 var(--blue);
+letter-spacing: -1px;
+transition: color 0.3s, text-shadow 0.3s;
+}
+
+.data-shard p {
+font-size: 18px;
+line-height: 1.6;
+color: #fff;
+font-family: 'Space Mono', monospace;
+text-shadow: 2px 2px 0 #000;
+transition: color 0.3s, text-shadow 0.3s, font-size 0.3s;
+}
+
+/* FOCUS MODE: Inverted colors, text dominates */
+.data-shard.focus-mode {
+    background: var(--white);
+    border: 2px solid #000;
+    border-left: 10px solid #000;
+    box-shadow: 0 0 80px rgba(255, 255, 255, 0.9);
+    width: 90vw;
+    max-width: 800px;
+    z-index: 50;
+    transform: translateY(0) scale(1) !important;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.data-shard.focus-mode h3 {
+    color: #000;
+    text-shadow: none;
+    font-size: 5rem;
+}
+
+.data-shard.focus-mode p {
+    color: #000;
+    text-shadow: none;
+    font-size: 2.5rem;
+    line-height: 1.5;
+    font-weight: bold;
+}
+
+.data-shard.boom {
+animation: shard-boom 0.4s steps(2);
+}
+@keyframes shard-boom {
+0% { background: #fff; filter: invert(1); }
+100% { background: rgba(0, 0, 0, 0.98); filter: invert(0); }
+}
+
+/* --- THE CENTRAL GRAPHIC CORE (Random lines construction) --- */
+.graphic-core {
+position: absolute;
+top: 50%;
+left: 50%;
+width: 500px;
+height: 500px;
+transform: translate(-50%, -50%);
+z-index: 40;
+display: flex;
+justify-content: center;
+align-items: center;
+pointer-events: auto;
+cursor: pointer;
+filter: drop-shadow(0 0 30px var(--orange));
+animation: core-glow 2s infinite alternate;
+}
+
+@keyframes core-glow {
+0% { filter: drop-shadow(0 0 20px var(--orange)); opacity: 0.8; }
+100% { filter: drop-shadow(0 0 60px var(--orange)); opacity: 1; }
+}
+
+.graphic-core svg {
+position: absolute;
+inset: 0;
+width: 100%;
+height: 100%;
+overflow: visible;
+}
+
+.core-text {
+position: relative;
+z-index: 10;
+text-align: center;
+background: rgba(0, 0, 0, 0.7);
+border: 1px solid rgba(255, 140, 0, 0.4);
+padding: 20px 40px;
+pointer-events: none;
+backdrop-filter: blur(2px);
+}
+
+.core-text h1 {
+font-family: 'Anton', sans-serif;
+font-size: 4rem;
+letter-spacing: -1px;
+color: var(--orange);
+text-shadow: 3px 3px 0 var(--pink), 0 0 30px var(--orange);
+line-height: 1;
+margin-bottom: 15px;
+}
+
+.core-text p {
+font-family: 'Space Mono', monospace;
+font-weight: 700;
+font-size: 1.5rem;
+letter-spacing: 4px;
+color: var(--acid);
+text-shadow: 0 0 10px var(--acid);
+}
+
+@media (max-width: 800px) {
+.graphic-core { width: 320px; height: 320px; }
+.core-text { padding: 15px; }
+.core-text h1 { font-size: 2.5rem; }
+.core-text p { font-size: 1rem; letter-spacing: 2px; }
+}
+/* --- END CENTRAL GRAPHIC CORE --- */
+
+/* THE MASSIVE HOLOGRAMS, LOGOS & EXPRESSIONS */
+.hologram {
+position: absolute;
+pointer-events: none;
+z-index: 15;
+text-transform: uppercase;
+mix-blend-mode: difference;
+}
+
+.h-glitch { top: 250px; left: 250px; font-family: 'Anton', sans-serif; font-size: 180px; color: transparent; -webkit-text-stroke: 3px var(--acid); text-shadow: 10px 10px 0 var(--pink); transform: rotate(-5deg); animation: glitch-shake 0.3s infinite alternate; }
+.h-glitch2 { top: 800px; left: 1600px; font-family: 'Anton', sans-serif; font-size: 140px; color: transparent; -webkit-text-stroke: 3px var(--blue); text-shadow: -10px -10px 0 var(--pink); transform: rotate(10deg); animation: glitch-shake 0.3s infinite alternate-reverse; }
+.h-wet { top: 1800px; left: 250px; font-family: 'Rubik Wet Paint', cursive; font-size: 140px; color: var(--acid); text-shadow: 5px 5px 0 var(--blue); transform: rotate(15deg); animation: breathe 5s infinite alternate; }
+.h-italic { top: 400px; left: 1600px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 160px; color: var(--green); text-shadow: 0 0 30px var(--green); transform: rotate(-15deg); animation: float-a 10s infinite; }
+.h-huge { top: 1500px; left: 1000px; font-family: 'Anton', sans-serif; font-size: 200px; color: rgba(255,255,255,0.05); letter-spacing: -5px; animation: shadow-dance 4s infinite alternate; }
+.h-spin { top: 1600px; left: 1700px; font-family: 'Rubik Glitch', cursive; font-size: 120px; color: var(--yellow); text-shadow: 5px 5px 0 var(--pink); animation: square-spin 8s infinite linear; }
+.h-mono { top: 200px; left: 1400px; font-family: 'Space Mono', monospace; font-weight: 700; font-size: 60px; letter-spacing: 10px; color: transparent; -webkit-text-stroke: 1px var(--white); animation: breathe 4s infinite alternate; }
+
+.h-slogan-1 { top: 700px; left: 200px; font-family: 'Anton', sans-serif; font-size: 110px; color: var(--acid); text-shadow: 0 0 30px var(--acid); animation: float-d 12s infinite; }
+.h-slogan-2 { top: 1850px; left: 1400px; font-family: 'Anton', sans-serif; font-size: 90px; color: var(--blue); text-shadow: 5px 5px 0 var(--pink); animation: float-b 14s infinite; }
+.h-slogan-3 { top: 100px; left: 600px; font-family: 'Rubik Wet Paint', cursive; font-size: 80px; color: var(--pink); text-shadow: 0 0 20px var(--pink); animation: breathe 6s infinite alternate; }
+
+/* WILDLIFE */
+.creature {
+position: absolute;
+font-size: 90px;
+z-index: 15;
+pointer-events: none;
+filter: drop-shadow(0 0 20px var(--acid)) saturate(2);
+transition: transform 0.3s ease-out;
+will-change: transform;
+mix-blend-mode: screen;
+}
+
+.splat {
+position: absolute;
+width: 15px;
+height: 15px;
+background: var(--acid);
+z-index: 10000;
+animation: splat-anim 1.5s forwards;
+mix-blend-mode: difference;
+}
+
+@keyframes static-jitter { 0% { transform: translate(0, 0); } 25% { transform: translate(-5%, -5%); } 50% { transform: translate(5%, 5%); } 100% { transform: translate(-5%, 5%); } }
+@keyframes breathe { 0% { opacity: 0.6; } 100% { opacity: 1; } }
+@keyframes shadow-dance { 0% { transform: translate(0, 0); opacity: 0.05; } 50% { transform: translate(-30px, 30px); opacity: 0.1; } 100% { transform: translate(0, 0); opacity: 0.05; } }
+@keyframes square-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes float-a { 0% { transform: translate(0, 0) rotate(-15deg); } 50% { transform: translate(50px, -50px) rotate(-5deg); } 100% { transform: translate(0, 0) rotate(-15deg); } }
+@keyframes float-b { 0% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(-80px, 40px) rotate(-20deg); } 100% { transform: translate(0, 0) rotate(0deg); } }
+@keyframes float-d { 0% { transform: rotate(0deg); } 50% { transform: rotate(180deg); } 100% { transform: rotate(360deg); } }
+@keyframes glitch-shake {
+0% { transform: translate(0, 0) rotate(-5deg); text-shadow: 10px 10px 0 var(--pink); }
+50% { transform: translate(-10px, 5px) rotate(-5deg); text-shadow: -10px -10px 0 var(--blue); }
+100% { transform: translate(5px, -5px) rotate(-5deg); text-shadow: 10px 10px 0 var(--acid); }
+}
+@keyframes splat-anim { 0% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; } 100% { transform: scale(0) translateY(600px) rotate(270deg); opacity: 0; } }
+
+body.glitching #environment {
+filter: invert(1) hue-rotate(200deg) blur(3px);
+animation: melt 0.4s steps(2) infinite;
+}
+@keyframes melt { 0% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.05) rotate(10deg); } 100% { transform: scale(1) rotate(-10deg); } }
+</style>
+</head>
+<body>
+
+<div id="environment">
+
+<!-- 7 GEOMETRY NODES -->
+<div class="geo-node" id="n-intro" style="top: 350px; left: 975px;">
+<svg viewBox="0 0 100 100" fill="none" stroke="var(--green)" stroke-width="1.5">
+<polygon points="50,20 80,35 50,50 20,35" stroke="var(--green)"></polygon>
+<polygon points="80,35 80,65 50,80 50,50" stroke="var(--green)"></polygon>
+<polygon points="20,35 20,65 50,80 50,50" stroke="var(--pink)"></polygon>
+<line x1="50" y1="50" x2="50" y2="80" stroke="var(--pink)"></line>
+<polygon points="50,10 70,20 50,30 30,20" stroke="var(--blue)" fill="rgba(0,240,255,0.1)"></polygon>
+</svg>
+<div class="data-shard" style="top: 20px; left: 50px;">
+<h3>Intro</h3>
+<p>Established in 2020. Short-term annual artist residency in Northern Portugal. A collaborative, community-driven space.</p>
+</div>
+</div>
+
+<div class="geo-node" id="n-arrival" style="top: 600px; left: 1500px;">
+<svg viewBox="0 0 100 100" fill="none" stroke="var(--green)" stroke-width="1.5">
+<polygon points="50,10 90,90 10,90" stroke="var(--acid)"></polygon>
+<line x1="50" y1="10" x2="50" y2="90" stroke="var(--acid)"></line>
+<polygon points="50,30 70,50 50,70 30,50" stroke="var(--blue)"></polygon>
+<line x1="50" y1="30" x2="80" y2="90" stroke="var(--blue)" stroke-dasharray="2,2"></line>
+<line x1="50" y1="30" x2="20" y2="90" stroke="var(--blue)" stroke-dasharray="2,2"></line>
+</svg>
+<div class="data-shard" style="top: 50px; left: 50px;">
+<h3>01. Arrival</h3>
+<p>24km from Porto. Bus line from Gaia. Arrive on the first scheduled day, or arrange other dates.</p>
+</div>
+</div>
+
+<div class="geo-node" id="n-facility" style="top: 1350px; left: 1900px;">
+<svg viewBox="0 0 100 100" fill="none" stroke="var(--green)" stroke-width="1.5">
+<polygon points="30,30 50,20 70,30 50,40" stroke="var(--acid)"></polygon>
+<polygon points="70,30 70,60 50,70 50,40" stroke="var(--blue)"></polygon>
+<polygon points="30,30 30,60 50,70 50,40" stroke="var(--pink)"></polygon>
+<polygon points="50,20 70,30 50,40 30,30" stroke="var(--green)"></polygon>
+<polygon points="40,60 50,55 60,60 50,65" stroke="var(--acid)"></polygon>
+<polygon points="60,60 60,75 50,80 50,65" stroke="var(--blue)"></polygon>
+<polygon points="40,60 40,75 50,80 50,65" stroke="var(--pink)"></polygon>
+<circle cx="50" cy="50" r="15" stroke="var(--green)" stroke-dasharray="4,2"></circle>
+</svg>
+<div class="data-shard" style="top: 100px; left: 0px;">
+<h3>02. Facilities</h3>
+<p>Workshop with natural light. Equipped for iron, wood, ceramics. Video and audio gear available.</p>
+</div>
+</div>
+
+<div class="geo-node" id="n-stay" style="top: 1600px; left: 1500px;">
+<svg viewBox="0 0 100 100" fill="none" stroke="var(--green)" stroke-width="1.5">
+<polygon points="50,20 80,35 80,80 50,95 20,80 20,35" stroke="var(--pink)"></polygon>
+<line x1="50" y1="20" x2="50" y2="95" stroke="var(--acid)"></line>
+<line x1="80" y1="35" x2="50" y2="55" stroke="var(--blue)"></line>
+<line x1="80" y1="80" x2="50" y2="95" stroke="var(--blue)"></line>
+<polygon points="30,45 70,45 50,65" stroke="var(--acid)"></polygon>
+</svg>
+<div class="data-shard" style="top: 50px; right: 0px;">
+<h3>03. Stay</h3>
+<p>Apply early for limited vacant rooms. Tents and camper vans can be set up at the camping area.</p>
+</div>
+</div>
+
+<div class="geo-node" id="n-climate" style="top: 1600px; left: 975px;">
+<svg viewBox="0 0 100 100" fill="none" stroke="var(--green)" stroke-width="1.5">
+<circle cx="50" cy="50" r="35" stroke="var(--green)"></circle>
+<ellipse cx="50" cy="50" rx="35" ry="15" stroke="var(--pink)"></ellipse>
+<ellipse cx="50" cy="50" rx="15" ry="35" stroke="var(--blue)"></ellipse>
+<line x1="50" y1="15" x2="50" y2="85" stroke="var(--acid)" stroke-dasharray="4,2"></line>
+<line x1="15" y1="50" x2="85" y2="50" stroke="var(--acid)" stroke-dasharray="4,2"></line>
+<path d="M20,80 L30,70 L40,80 L50,70 L60,80 L70,70 L80,80" stroke="var(--yellow)"></path>
+</svg>
+<div class="data-shard" style="bottom: 20px; left: 50px;">
+<h3>04. Climate</h3>
+<p>Rough! Really warm and cold in 24 hours. Bring both summer clothes and warm garments. Pool and river nearby.</p>
+</div>
+</div>
+
+<div class="geo-node" id="n-cost" style="top: 1600px; left: 450px;">
+<svg viewBox="0 0 100 100" fill="none" stroke="var(--green)" stroke-width="1.5">
+<polygon points="50,15 80,50 50,85 20,50" stroke="var(--acid)"></polygon>
+<polygon points="20,50 50,35 80,50 50,65" stroke="var(--pink)"></polygon>
+<polygon points="50,15 50,35 80,50 50,65" stroke="var(--blue)"></polygon>
+<circle cx="50" cy="50" r="30" stroke="var(--yellow)" stroke-dasharray="5,2"></circle>
+<polygon points="50,25 60,50 50,75 40,50" stroke="var(--green)"></polygon>
+</svg>
+<div class="data-shard" style="top: 50px; left: 50px;">
+<h3>05. Cost</h3>
+<p>Collaborative effort. Bar/food covers expenses. Two main meals per day. Conscious contribution requested.</p>
+</div>
+</div>
+
+<div class="geo-node" id="n-exp" style="top: 1350px; left: 50px;">
+<svg viewBox="0 0 100 100" fill="none" stroke="var(--green)" stroke-width="1.5">
+<polygon points="50,10 65,25 85,15 75,35 95,50 75,65 85,85 65,75 50,95 35,75 15,85 25,65 5,50 25,35 15,15 35,25" stroke="var(--acid)"></polygon>
+<circle cx="50" cy="50" r="20" stroke-dasharray="2,2" stroke="var(--blue)"></circle>
+<line x1="50" y1="10" x2="50" y2="95" stroke="var(--pink)"></line>
+<line x1="5" y1="50" x2="95" y2="50" stroke="var(--pink)"></line>
+</svg>
+<div class="data-shard" style="top: 100px; left: 20px;">
+<h3>06. Experiment</h3>
+<p>This is not a webpage. This is a fragment of art. Click here to trigger the shutdown glitch.</p>
+</div>
+</div>
+
+<!-- THE MASSIVE HOLOGRAMS -->
+<div class="hologram h-glitch">ZONA</div>
+<div class="hologram h-glitch2">AUTO</div>
+<div class="hologram h-wet">Z▲26</div>
+<div class="hologram h-italic">Zona Autónoma</div>
+<div class="hologram h-huge">NOMA</div>
+<div class="hologram h-spin">AUTONOMA</div>
+<div class="hologram h-mono">ZONA</div>
+
+<div class="hologram h-slogan-1">ARTISTS OUTSIDE</div>
+<div class="hologram h-slogan-2">ARTISTS OUTSIDE</div>
+<div class="hologram h-slogan-3">ARTISTS OUTSIDE</div>
+
+<!-- THE CENTRAL RANDOM GRAPHIC CONSTRUCTION WITH PRINCIPAL TEXT -->
+<div class="graphic-core" id="core">
+    <!-- Random graphic construction from lines -->
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <!-- Asymmetric intersecting lines -->
+        <line x1="5" y1="50" x2="95" y2="50" stroke="var(--blue)" stroke-width="1.5" stroke-dasharray="4,4" />
+        <line x1="50" y1="5" x2="50" y2="95" stroke="var(--pink)" stroke-width="1.5" stroke-dasharray="4,4" />
+        
+        <line x1="15" y1="15" x2="85" y2="85" stroke="var(--acid)" stroke-width="2" />
+        <line x1="85" y1="15" x2="15" y2="85" stroke="var(--acid)" stroke-width="2" />
+        
+        <!-- Broken polygon frame -->
+        <polygon points="30,20 70,20 80,80 20,80" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linejoin="round" />
+        <polygon points="50,30 60,40 50,50 40,40" fill="none" stroke="var(--yellow)" stroke-width="1.5" />
+        
+        <!-- Radial lines -->
+        <line x1="50" y1="50" x2="20" y2="20" stroke="var(--blue)" stroke-width="2" />
+        <line x1="50" y1="50" x2="80" y2="80" stroke="var(--blue)" stroke-width="2" />
+        <line x1="50" y1="50" x2="95" y2="30" stroke="var(--pink)" stroke-width="2" />
+        <line x1="50" y1="50" x2="5" y2="70" stroke="var(--green)" stroke-width="2" />
+        
+        <!-- Central broken circle -->
+        <circle cx="50" cy="50" r="20" fill="none" stroke="var(--orange)" stroke-width="2" />
+        <circle cx="50" cy="50" r="10" fill="none" stroke="var(--acid)" stroke-width="1" stroke-dasharray="2,2" />
+        
+        <!-- Map grid construction -->
+        <line x1="25" y1="25" x2="25" y2="75" stroke="var(--white)" stroke-width="0.5" opacity="0.6" />
+        <line x1="75" y1="25" x2="75" y2="75" stroke="var(--white)" stroke-width="0.5" opacity="0.6" />
+        <line x1="25" y1="25" x2="75" y2="25" stroke="var(--white)" stroke-width="0.5" opacity="0.6" />
+        <line x1="25" y1="75" x2="75" y2="75" stroke="var(--white)" stroke-width="0.5" opacity="0.6" />
+        
+        <!-- Small floating nodes -->
+        <circle cx="20" cy="50" r="2" fill="var(--acid)" />
+        <circle cx="80" cy="50" r="2" fill="var(--blue)" />
+        <circle cx="50" cy="20" r="2" fill="var(--pink)" />
+        <circle cx="50" cy="80" r="2" fill="var(--orange)" />
+    </svg>
+    
+    <!-- Principal Text -->
+    <div class="core-text">
+        <h1>ZONA AUTÓNOMA</h1>
+        <p>20-26 SEPTEMBER</p>
+    </div>
+</div>
+
+<!-- WILDLIFE -->
+<div class="creature" data-x="600" data-y="600" style="left: 600px; top: 600px;">🦓</div>
+<div class="creature" data-x="1500" data-y="800" style="left: 1500px; top: 800px;">🥷</div>
+<div class="creature" data-x="800" data-y="1800" style="left: 800px; top: 1800px;">🛸</div>
+<div class="creature" data-x="1300" data-y="1500" style="left: 1300px; top: 1500px;">🐢</div>
+<div class="creature" data-x="300" data-y="1400" style="left: 300px; top: 1400px;">🐒</div>
+</div>
+
+<script>
+const env = document.getElementById('environment');
+const envWidth = 2400;
+const envHeight = 2400;
+
+function clampCamera() {
+const maxLeft = 0;
+const minLeft = window.innerWidth - envWidth;
+const maxTop = 0;
+const minTop = window.innerHeight - envHeight;
+let currentLeft = env.offsetLeft;
+let currentTop = env.offsetTop;
+if (currentLeft > maxLeft) currentLeft = maxLeft;
+if (currentLeft < minLeft) currentLeft = minLeft;
+if (currentTop > maxTop) currentTop = maxTop;
+if (currentTop < minTop) currentTop = minTop;
+env.style.left = currentLeft + 'px';
+env.style.top = currentTop + 'px';
+}
+
+let isDown = false;
+let startX, startY, offsetX, offsetY;
+let lastX, lastY, velX = 0, velY = 0;
+
+function centerWorld() {
+const core = document.getElementById('core');
+env.style.left = (window.innerWidth / 2 - core.offsetLeft - core.offsetWidth / 2) + 'px';
+env.style.top = (window.innerHeight / 2 - core.offsetTop - core.offsetHeight / 2) + 'px';
+clampCamera();
+}
+centerWorld();
+window.onresize = () => clampCamera();
+
+env.addEventListener('pointerdown', (e) => {
+isDown = true;
+startX = e.clientX;
+startY = e.clientY;
+offsetX = env.offsetLeft;
+offsetY = env.offsetTop;
+lastX = startX;
+lastY = startY;
+e.preventDefault();
+});
+
+window.addEventListener('pointerup', () => {
+if (!isDown) return;
+isDown = false;
+function momentum() {
+if (Math.abs(velX) < 0.5 && Math.abs(velY) < 0.5) return;
+env.style.left = (env.offsetLeft + velX) + 'px';
+env.style.top = (env.offsetTop + velY) + 'px';
+clampCamera();
+velX *= 0.95;
+velY *= 0.95;
+requestAnimationFrame(momentum);
+}
+momentum();
+});
+
+let lastSplatTime = 0;
+const nodes = document.querySelectorAll('.geo-node');
+const shards = document.querySelectorAll('.data-shard');
+const creatures = document.querySelectorAll('.creature');
+
+window.addEventListener('pointermove', (e) => {
+const now = Date.now();
+if (now - lastSplatTime < 50) return;
+lastSplatTime = now;
+
+const splat = document.createElement('div');
+splat.className = 'splat';
+splat.style.left = e.clientX + 'px';
+splat.style.top = e.clientY + 'px';
+document.body.appendChild(splat);
+setTimeout(() => splat.remove(), 1500);
+
+if (!isDown) return;
+const dx = e.clientX - startX;
+const dy = e.clientY - startY;
+env.style.left = (offsetX + dx) + 'px';
+env.style.top = (offsetY + dy) + 'px';
+clampCamera();
+velX = e.clientX - lastX;
+velY = e.clientY - lastY;
+lastX = e.clientX;
+lastY = e.clientY;
+
+nodes.forEach(node => {
+const rect = node.getBoundingClientRect();
+const dist = Math.hypot(rect.left + rect.width/2 - e.clientX, rect.top + rect.height/2 - e.clientY);
+if (dist < 450) node.classList.add('proximity');
+else node.classList.remove('proximity');
+});
+
+creatures.forEach(creature => {
+const x = parseFloat(creature.style.left || creature.dataset.x);
+const y = parseFloat(creature.style.top || creature.dataset.y);
+const envX = e.clientX - env.offsetLeft;
+const envY = e.clientY - env.offsetTop;
+const dist = Math.hypot(x - envX, y - envY);
+if (dist < 500) {
+const angle = Math.atan2(y - envY, x - envX);
+const newX = x + Math.cos(angle) * 6;
+const newY = y + Math.sin(angle) * 6;
+creature.style.left = newX + 'px';
+creature.style.top = newY + 'px';
+creature.dataset.x = newX;
+creature.dataset.y = newY;
+}
+});
+});
+
+shards.forEach(shard => {
+shard.addEventListener('pointerdown', (e) => {
+e.stopPropagation();
+if (shard.classList.contains('focus-mode')) {
+    shard.classList.remove('focus-mode');
+    shard.classList.add('boom');
+    setTimeout(() => shard.classList.remove('boom'), 500);
+    const rect = shard.getBoundingClientRect();
+    for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+            const splat = document.createElement('div');
+            splat.className = 'splat';
+            splat.style.left = (rect.left + Math.random() * rect.width) + 'px';
+            splat.style.top = (rect.top + Math.random() * rect.height) + 'px';
+            splat.style.backgroundColor = ['var(--acid)', 'var(--pink)', 'var(--blue)'][Math.floor(Math.random() * 3)];
+            document.body.appendChild(splat);
+            setTimeout(() => splat.remove(), 1500);
+        }, i * 30);
+    }
+} else {
+    shard.classList.add('focus-mode');
+}
+});
+});
+
+// CENTRAL CORE RESET (GRAPHIC CONSTRUCTION)
+document.getElementById('core').addEventListener('pointerdown', (e) => {
+e.stopPropagation();
+document.body.classList.add('glitching');
+creatures.forEach(c => {
+c.style.left = Math.random() * (envWidth - 100) + 'px';
+c.style.top = Math.random() * (envHeight - 100) + 'px';
+c.dataset.x = c.style.left;
+c.dataset.y = c.style.top;
+});
+setTimeout(() => {
+document.body.classList.remove('glitching');
+centerWorld();
+}, 700);
+});
+</script>
+</body>
+</html>
