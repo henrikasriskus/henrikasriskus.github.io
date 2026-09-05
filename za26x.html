@@ -47,7 +47,7 @@ body::after {
 content: "";
 position: fixed;
 top: 0; left: 0; width: 100vw; height: 100vh;
-background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.95) 100%);
+background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.95) 100%);
 pointer-events: none;
 z-index: 9998;
 }
@@ -58,18 +58,28 @@ width: 2400px;
 height: 2400px;
 top: 0;
 left: 0;
+/* OVERLOADED MAP GRID & GRAPHICS */
 background-color: var(--bg);
 background-image:
-repeating-conic-gradient(from 0deg at 50% 50%, rgba(57, 255, 20, 0.06) 0deg, rgba(57, 255, 20, 0.06) 2deg, transparent 2deg, transparent 15deg),
+/* Dense grid */
+repeating-linear-gradient(0deg, transparent 0, transparent 49px, rgba(0, 240, 255, 0.1) 49px, rgba(0, 240, 255, 0.1) 50px),
+repeating-linear-gradient(90deg, transparent 0, transparent 49px, rgba(0, 240, 255, 0.1) 49px, rgba(0, 240, 255, 0.1) 50px),
+/* Diagonal tactical grid */
+repeating-linear-gradient(45deg, transparent 0, transparent 59px, rgba(255, 42, 109, 0.08) 59px, rgba(255, 42, 109, 0.08) 60px),
+repeating-linear-gradient(-45deg, transparent 0, transparent 59px, rgba(57, 255, 20, 0.08) 59px, rgba(57, 255, 20, 0.08) 60px),
+/* Dotted nodes */
+radial-gradient(circle, rgba(0,255,100,0.2) 2px, transparent 2px),
+/* Contour Rings */
+repeating-conic-gradient(from 0deg at 50% 50%, rgba(57, 255, 20, 0.05) 0deg, rgba(57, 255, 20, 0.05) 2deg, transparent 2deg, transparent 15deg),
 repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 70px, rgba(0, 240, 255, 0.08) 70px, rgba(0, 240, 255, 0.08) 72px),
-repeating-linear-gradient(0deg, transparent 0, transparent 99px, rgba(0, 240, 255, 0.15) 99px, rgba(0, 240, 255, 0.15) 100px),
-repeating-linear-gradient(90deg, transparent 0, transparent 99px, rgba(0, 240, 255, 0.15) 99px, rgba(0, 240, 255, 0.15) 100px),
 radial-gradient(circle at 50% 50%, #1a2b1a 0%, #000000 80%);
-will-change: transform;
+background-size: 50px 50px, 50px 50px, 60px 60px, 60px 60px, 150px 150px, 100% 100%, 100% 100%, 100% 100%;
+will-change: transform, left, top;
+transform-origin: 0 0;
 z-index: 10;
 }
 
-/* THE 7 INFOMATIONAL GEOMETRY NODES */
+/* THE 7 INFO GEOMETRY NODES */
 .geo-node {
 position: absolute;
 width: 450px;
@@ -177,7 +187,7 @@ animation: shard-boom 0.4s steps(2);
 100% { background: rgba(0, 0, 0, 0.98); filter: invert(0); }
 }
 
-/* --- THE CENTRAL GRAPHIC CORE (Random lines construction) --- */
+/* CENTRAL GRAPHIC CORE */
 .graphic-core {
 position: absolute;
 top: 50%;
@@ -244,9 +254,8 @@ text-shadow: 0 0 10px var(--acid);
 .core-text h1 { font-size: 2.5rem; }
 .core-text p { font-size: 1rem; letter-spacing: 2px; }
 }
-/* --- END CENTRAL GRAPHIC CORE --- */
 
-/* THE MASSIVE HOLOGRAMS, LOGOS & EXPRESSIONS */
+/* MASSIVE HOLOGRAMS */
 .hologram {
 position: absolute;
 pointer-events: none;
@@ -314,14 +323,14 @@ animation: melt 0.4s steps(2) infinite;
 
 <div id="environment">
 
-<!-- 7 GEOMETRY NODES -->
+<!-- 7 GEOMETRY NODES (Complex illustrations) -->
 <div class="geo-node" id="n-intro" style="top: 350px; left: 975px;">
 <svg viewBox="0 0 100 100" fill="none" stroke="var(--green)" stroke-width="1.5">
-<polygon points="50,20 80,35 50,50 20,35" stroke="var(--green)"></polygon>
-<polygon points="80,35 80,65 50,80 50,50" stroke="var(--green)"></polygon>
-<polygon points="20,35 20,65 50,80 50,50" stroke="var(--pink)"></polygon>
-<line x1="50" y1="50" x2="50" y2="80" stroke="var(--pink)"></line>
-<polygon points="50,10 70,20 50,30 30,20" stroke="var(--blue)" fill="rgba(0,240,255,0.1)"></polygon>
+<circle cx="50" cy="50" r="35"></circle>
+<circle cx="50" cy="50" r="15"></circle>
+<path d="M15,50 L35,50 L45,30 L55,70 L65,50 L85,50"></path>
+<polygon points="50,15 65,30 65,70 35,70 35,30"></polygon>
+<circle cx="70" cy="20" r="5"></circle>
 </svg>
 <div class="data-shard" style="top: 20px; left: 50px;">
 <h3>Intro</h3>
@@ -331,11 +340,12 @@ animation: melt 0.4s steps(2) infinite;
 
 <div class="geo-node" id="n-arrival" style="top: 600px; left: 1500px;">
 <svg viewBox="0 0 100 100" fill="none" stroke="var(--green)" stroke-width="1.5">
-<polygon points="50,10 90,90 10,90" stroke="var(--acid)"></polygon>
-<line x1="50" y1="10" x2="50" y2="90" stroke="var(--acid)"></line>
-<polygon points="50,30 70,50 50,70 30,50" stroke="var(--blue)"></polygon>
-<line x1="50" y1="30" x2="80" y2="90" stroke="var(--blue)" stroke-dasharray="2,2"></line>
-<line x1="50" y1="30" x2="20" y2="90" stroke="var(--blue)" stroke-dasharray="2,2"></line>
+<line x1="10" y1="90" x2="90" y2="10"></line>
+<line x1="20" y1="90" x2="90" y2="20"></line>
+<rect x="30" y="30" width="10" height="10"></rect>
+<rect x="50" y="50" width="10" height="10"></rect>
+<polygon points="20,80 40,60 60,80"></polygon>
+<polygon points="60,80 80,60 90,80"></polygon>
 </svg>
 <div class="data-shard" style="top: 50px; left: 50px;">
 <h3>01. Arrival</h3>
@@ -345,14 +355,14 @@ animation: melt 0.4s steps(2) infinite;
 
 <div class="geo-node" id="n-facility" style="top: 1350px; left: 1900px;">
 <svg viewBox="0 0 100 100" fill="none" stroke="var(--green)" stroke-width="1.5">
-<polygon points="30,30 50,20 70,30 50,40" stroke="var(--acid)"></polygon>
-<polygon points="70,30 70,60 50,70 50,40" stroke="var(--blue)"></polygon>
-<polygon points="30,30 30,60 50,70 50,40" stroke="var(--pink)"></polygon>
-<polygon points="50,20 70,30 50,40 30,30" stroke="var(--green)"></polygon>
-<polygon points="40,60 50,55 60,60 50,65" stroke="var(--acid)"></polygon>
-<polygon points="60,60 60,75 50,80 50,65" stroke="var(--blue)"></polygon>
-<polygon points="40,60 40,75 50,80 50,65" stroke="var(--pink)"></polygon>
-<circle cx="50" cy="50" r="15" stroke="var(--green)" stroke-dasharray="4,2"></circle>
+<rect x="10" y="30" width="50" height="30"></rect>
+<rect x="60" y="20" width="30" height="50"></rect>
+<circle cx="35" cy="45" r="10"></circle>
+<line x1="10" y1="45" x2="60" y2="45"></line>
+<line x1="35" y1="30" x2="35" y2="60"></line>
+<circle cx="75" cy="35" r="5"></circle>
+<circle cx="75" cy="55" r="5"></circle>
+<polygon points="60,70 75,80 90,70"></polygon>
 </svg>
 <div class="data-shard" style="top: 100px; left: 0px;">
 <h3>02. Facilities</h3>
@@ -362,11 +372,12 @@ animation: melt 0.4s steps(2) infinite;
 
 <div class="geo-node" id="n-stay" style="top: 1600px; left: 1500px;">
 <svg viewBox="0 0 100 100" fill="none" stroke="var(--green)" stroke-width="1.5">
-<polygon points="50,20 80,35 80,80 50,95 20,80 20,35" stroke="var(--pink)"></polygon>
-<line x1="50" y1="20" x2="50" y2="95" stroke="var(--acid)"></line>
-<line x1="80" y1="35" x2="50" y2="55" stroke="var(--blue)"></line>
-<line x1="80" y1="80" x2="50" y2="95" stroke="var(--blue)"></line>
-<polygon points="30,45 70,45 50,65" stroke="var(--acid)"></polygon>
+<polygon points="50,10 30,40 70,40"></polygon>
+<polygon points="50,10 30,40 20,60"></polygon>
+<polygon points="50,10 70,40 80,60"></polygon>
+<rect x="45" y="40" width="10" height="20"></rect>
+<circle cx="50" cy="70" r="10" stroke-dasharray="2,2"></circle>
+<line x1="40" y1="80" x2="60" y2="80"></line>
 </svg>
 <div class="data-shard" style="top: 50px; right: 0px;">
 <h3>03. Stay</h3>
@@ -376,12 +387,15 @@ animation: melt 0.4s steps(2) infinite;
 
 <div class="geo-node" id="n-climate" style="top: 1600px; left: 975px;">
 <svg viewBox="0 0 100 100" fill="none" stroke="var(--green)" stroke-width="1.5">
-<circle cx="50" cy="50" r="35" stroke="var(--green)"></circle>
-<ellipse cx="50" cy="50" rx="35" ry="15" stroke="var(--pink)"></ellipse>
-<ellipse cx="50" cy="50" rx="15" ry="35" stroke="var(--blue)"></ellipse>
-<line x1="50" y1="15" x2="50" y2="85" stroke="var(--acid)" stroke-dasharray="4,2"></line>
-<line x1="15" y1="50" x2="85" y2="50" stroke="var(--acid)" stroke-dasharray="4,2"></line>
-<path d="M20,80 L30,70 L40,80 L50,70 L60,80 L70,70 L80,80" stroke="var(--yellow)"></path>
+<circle cx="30" cy="30" r="15"></circle>
+<circle cx="30" cy="30" r="5"></circle>
+<line x1="30" y1="5" x2="30" y2="15"></line>
+<line x1="30" y1="45" x2="30" y2="55"></line>
+<line x1="5" y1="30" x2="15" y2="30"></line>
+<line x1="45" y1="30" x2="55" y2="30"></line>
+<path d="M20,70 L40,70 L30,80"></path>
+<path d="M50,60 L70,60 L60,70"></path>
+<path d="M70,80 L90,80 L80,90"></path>
 </svg>
 <div class="data-shard" style="bottom: 20px; left: 50px;">
 <h3>04. Climate</h3>
@@ -391,11 +405,12 @@ animation: melt 0.4s steps(2) infinite;
 
 <div class="geo-node" id="n-cost" style="top: 1600px; left: 450px;">
 <svg viewBox="0 0 100 100" fill="none" stroke="var(--green)" stroke-width="1.5">
-<polygon points="50,15 80,50 50,85 20,50" stroke="var(--acid)"></polygon>
-<polygon points="20,50 50,35 80,50 50,65" stroke="var(--pink)"></polygon>
-<polygon points="50,15 50,35 80,50 50,65" stroke="var(--blue)"></polygon>
-<circle cx="50" cy="50" r="30" stroke="var(--yellow)" stroke-dasharray="5,2"></circle>
-<polygon points="50,25 60,50 50,75 40,50" stroke="var(--green)"></polygon>
+<circle cx="50" cy="30" r="20"></circle>
+<circle cx="50" cy="70" r="20"></circle>
+<line x1="30" y1="30" x2="70" y2="30"></line>
+<line x1="30" y1="70" x2="70" y2="70"></line>
+<polygon points="50,10 60,20 40,20"></polygon>
+<polygon points="50,50 60,60 40,60"></polygon>
 </svg>
 <div class="data-shard" style="top: 50px; left: 50px;">
 <h3>05. Cost</h3>
@@ -405,10 +420,11 @@ animation: melt 0.4s steps(2) infinite;
 
 <div class="geo-node" id="n-exp" style="top: 1350px; left: 50px;">
 <svg viewBox="0 0 100 100" fill="none" stroke="var(--green)" stroke-width="1.5">
-<polygon points="50,10 65,25 85,15 75,35 95,50 75,65 85,85 65,75 50,95 35,75 15,85 25,65 5,50 25,35 15,15 35,25" stroke="var(--acid)"></polygon>
-<circle cx="50" cy="50" r="20" stroke-dasharray="2,2" stroke="var(--blue)"></circle>
-<line x1="50" y1="10" x2="50" y2="95" stroke="var(--pink)"></line>
-<line x1="5" y1="50" x2="95" y2="50" stroke="var(--pink)"></line>
+<polygon points="50,10 90,50 50,90 10,50"></polygon>
+<polygon points="50,20 80,50 50,80 20,50"></polygon>
+<line x1="10" y1="50" x2="90" y2="50"></line>
+<line x1="50" y1="10" x2="50" y2="90"></line>
+<circle cx="50" cy="50" r="30" stroke-dasharray="2,2"></circle>
 </svg>
 <div class="data-shard" style="top: 100px; left: 20px;">
 <h3>06. Experiment</h3>
@@ -429,45 +445,31 @@ animation: melt 0.4s steps(2) infinite;
 <div class="hologram h-slogan-2">ARTISTS OUTSIDE</div>
 <div class="hologram h-slogan-3">ARTISTS OUTSIDE</div>
 
-<!-- THE CENTRAL RANDOM GRAPHIC CONSTRUCTION WITH PRINCIPAL TEXT -->
+<!-- CENTRAL RANDOM GRAPHIC CONSTRUCTION -->
 <div class="graphic-core" id="core">
-    <!-- Random graphic construction from lines -->
     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <!-- Asymmetric intersecting lines -->
         <line x1="5" y1="50" x2="95" y2="50" stroke="var(--blue)" stroke-width="1.5" stroke-dasharray="4,4" />
         <line x1="50" y1="5" x2="50" y2="95" stroke="var(--pink)" stroke-width="1.5" stroke-dasharray="4,4" />
-        
         <line x1="15" y1="15" x2="85" y2="85" stroke="var(--acid)" stroke-width="2" />
         <line x1="85" y1="15" x2="15" y2="85" stroke="var(--acid)" stroke-width="2" />
-        
-        <!-- Broken polygon frame -->
         <polygon points="30,20 70,20 80,80 20,80" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linejoin="round" />
         <polygon points="50,30 60,40 50,50 40,40" fill="none" stroke="var(--yellow)" stroke-width="1.5" />
-        
-        <!-- Radial lines -->
         <line x1="50" y1="50" x2="20" y2="20" stroke="var(--blue)" stroke-width="2" />
         <line x1="50" y1="50" x2="80" y2="80" stroke="var(--blue)" stroke-width="2" />
         <line x1="50" y1="50" x2="95" y2="30" stroke="var(--pink)" stroke-width="2" />
         <line x1="50" y1="50" x2="5" y2="70" stroke="var(--green)" stroke-width="2" />
-        
-        <!-- Central broken circle -->
         <circle cx="50" cy="50" r="20" fill="none" stroke="var(--orange)" stroke-width="2" />
         <circle cx="50" cy="50" r="10" fill="none" stroke="var(--acid)" stroke-width="1" stroke-dasharray="2,2" />
-        
-        <!-- Map grid construction -->
         <line x1="25" y1="25" x2="25" y2="75" stroke="var(--white)" stroke-width="0.5" opacity="0.6" />
         <line x1="75" y1="25" x2="75" y2="75" stroke="var(--white)" stroke-width="0.5" opacity="0.6" />
         <line x1="25" y1="25" x2="75" y2="25" stroke="var(--white)" stroke-width="0.5" opacity="0.6" />
         <line x1="25" y1="75" x2="75" y2="75" stroke="var(--white)" stroke-width="0.5" opacity="0.6" />
-        
-        <!-- Small floating nodes -->
         <circle cx="20" cy="50" r="2" fill="var(--acid)" />
         <circle cx="80" cy="50" r="2" fill="var(--blue)" />
         <circle cx="50" cy="20" r="2" fill="var(--pink)" />
         <circle cx="50" cy="80" r="2" fill="var(--orange)" />
     </svg>
     
-    <!-- Principal Text -->
     <div class="core-text">
         <h1>ZONA AUTÓNOMA</h1>
         <p>20-26 SEPTEMBER</p>
@@ -484,155 +486,258 @@ animation: melt 0.4s steps(2) infinite;
 
 <script>
 const env = document.getElementById('environment');
+const viewport = document.body;
 const envWidth = 2400;
 const envHeight = 2400;
 
-function clampCamera() {
-const maxLeft = 0;
-const minLeft = window.innerWidth - envWidth;
-const maxTop = 0;
-const minTop = window.innerHeight - envHeight;
-let currentLeft = env.offsetLeft;
-let currentTop = env.offsetTop;
-if (currentLeft > maxLeft) currentLeft = maxLeft;
-if (currentLeft < minLeft) currentLeft = minLeft;
-if (currentTop > maxTop) currentTop = maxTop;
-if (currentTop < minTop) currentTop = minTop;
-env.style.left = currentLeft + 'px';
-env.style.top = currentTop + 'px';
-}
+let scale = 1.0;
+const MIN_SCALE = 0.4;
+const MAX_SCALE = 2.5;
 
-let isDown = false;
-let startX, startY, offsetX, offsetY;
-let lastX, lastY, velX = 0, velY = 0;
+function clampCamera() {
+    const currentWidth = envWidth * scale;
+    const currentHeight = envHeight * scale;
+
+    const maxLeft = 0;
+    const minLeft = window.innerWidth - currentWidth;
+    const maxTop = 0;
+    const minTop = window.innerHeight - currentHeight;
+
+    let currentLeft = env.offsetLeft;
+    let currentTop = env.offsetTop;
+
+    if (currentLeft > maxLeft) currentLeft = maxLeft;
+    if (currentLeft < minLeft) currentLeft = minLeft;
+    if (currentTop > maxTop) currentTop = maxTop;
+    if (currentTop < minTop) currentTop = minTop;
+
+    env.style.left = currentLeft + 'px';
+    env.style.top = currentTop + 'px';
+}
 
 function centerWorld() {
-const core = document.getElementById('core');
-env.style.left = (window.innerWidth / 2 - core.offsetLeft - core.offsetWidth / 2) + 'px';
-env.style.top = (window.innerHeight / 2 - core.offsetTop - core.offsetHeight / 2) + 'px';
-clampCamera();
+    const coreX = 1200;
+    const coreY = 1200;
+    env.style.left = (window.innerWidth / 2 - coreX * scale) + 'px';
+    env.style.top = (window.innerHeight / 2 - coreY * scale) + 'px';
+    clampCamera();
 }
+
+function setScale(newScale, originX, originY) {
+    if (newScale < MIN_SCALE) newScale = MIN_SCALE;
+    if (newScale > MAX_SCALE) newScale = MAX_SCALE;
+
+    // Zoom towards the screen point
+    const worldX = (originX - env.offsetLeft) / scale;
+    const worldY = (originY - env.offsetTop) / scale;
+
+    scale = newScale;
+    env.style.transform = "scale(" + scale + ")";
+    
+    env.style.left = (originX - worldX * scale) + 'px';
+    env.style.top = (originY - worldY * scale) + 'px';
+    
+    clampCamera();
+}
+
+// Initial setup
+env.style.transform = "scale(" + scale + ")";
 centerWorld();
 window.onresize = () => clampCamera();
 
+// --- INPUT HANDLING: DRAG AND ZOOM ---
+let isDown = false;
+let isPinching = false;
+let startX, startY, offsetX, offsetY;
+let lastX, lastY, velX = 0, velY = 0;
+let lastTouchDist = 0;
+let pinchOriginX = 0, pinchOriginY = 0;
+
+// Desktop Drag
 env.addEventListener('pointerdown', (e) => {
-isDown = true;
-startX = e.clientX;
-startY = e.clientY;
-offsetX = env.offsetLeft;
-offsetY = env.offsetTop;
-lastX = startX;
-lastY = startY;
-e.preventDefault();
+    isDown = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    offsetX = env.offsetLeft;
+    offsetY = env.offsetTop;
+    lastX = startX;
+    lastY = startY;
+    e.preventDefault();
+});
+
+// Desktop Zoom
+window.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+    setScale(scale - e.deltaY * 0.001, mouseX, mouseY);
+}, {passive: false});
+
+// Mouse Move
+window.addEventListener('pointermove', (e) => {
+    if (!isDown || isPinching) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    env.style.left = (offsetX + dx) + 'px';
+    env.style.top = (offsetY + dy) + 'px';
+    clampCamera();
+    velX = e.clientX - lastX;
+    velY = e.clientY - lastY;
+    lastX = e.clientX;
+    lastY = e.clientY;
 });
 
 window.addEventListener('pointerup', () => {
-if (!isDown) return;
-isDown = false;
-function momentum() {
-if (Math.abs(velX) < 0.5 && Math.abs(velY) < 0.5) return;
-env.style.left = (env.offsetLeft + velX) + 'px';
-env.style.top = (env.offsetTop + velY) + 'px';
-clampCamera();
-velX *= 0.95;
-velY *= 0.95;
-requestAnimationFrame(momentum);
-}
-momentum();
+    if (!isDown) return;
+    isDown = false;
+    function momentum() {
+        if (Math.abs(velX) < 0.5 && Math.abs(velY) < 0.5) return;
+        env.style.left = (env.offsetLeft + velX) + 'px';
+        env.style.top = (env.offsetTop + velY) + 'px';
+        clampCamera();
+        velX *= 0.95;
+        velY *= 0.95;
+        requestAnimationFrame(momentum);
+    }
+    momentum();
 });
 
-let lastSplatTime = 0;
+// Mobile Touch (Drag & Pinch)
+viewport.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+        isPinching = true;
+        const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        lastTouchDist = d;
+        pinchOriginX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        pinchOriginY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+    } else if (e.touches.length === 1) {
+        isPinching = false;
+        isDown = true;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        offsetX = env.offsetLeft;
+        offsetY = env.offsetTop;
+        lastX = startX;
+        lastY = startY;
+    }
+    e.preventDefault();
+}, {passive: false});
+
+viewport.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2 && isPinching) {
+        const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        setScale(scale * (d / lastTouchDist), pinchOriginX, pinchOriginY);
+        lastTouchDist = d;
+    } else if (e.touches.length === 1 && isDown) {
+        const dx = e.touches[0].clientX - startX;
+        const dy = e.touches[0].clientY - startY;
+        env.style.left = (offsetX + dx) + 'px';
+        env.style.top = (offsetY + dy) + 'px';
+        clampCamera();
+        velX = e.touches[0].clientX - lastX;
+        velY = e.touches[0].clientY - lastY;
+        lastX = e.touches[0].clientX;
+        lastY = e.touches[0].clientY;
+    }
+    e.preventDefault();
+}, {passive: false});
+
+viewport.addEventListener('touchend', (e) => {
+    if (e.touches.length === 0) {
+        isPinching = false;
+        if (isDown) {
+            isDown = false;
+            function momentum() {
+                if (Math.abs(velX) < 0.5 && Math.abs(velY) < 0.5) return;
+                env.style.left = (env.offsetLeft + velX) + 'px';
+                env.style.top = (env.offsetTop + velY) + 'px';
+                clampCamera();
+                velX *= 0.95;
+                velY *= 0.95;
+                requestAnimationFrame(momentum);
+            }
+            momentum();
+        }
+    }
+    e.preventDefault();
+}, {passive: false});
+
+
+// --- INTERACTIVE ELEMENTS ---
 const nodes = document.querySelectorAll('.geo-node');
 const shards = document.querySelectorAll('.data-shard');
 const creatures = document.querySelectorAll('.creature');
 
 window.addEventListener('pointermove', (e) => {
-const now = Date.now();
-if (now - lastSplatTime < 50) return;
-lastSplatTime = now;
+    // Proximity detection
+    nodes.forEach(node => {
+        const rect = node.getBoundingClientRect();
+        const dist = Math.hypot(rect.left + rect.width/2 - e.clientX, rect.top + rect.height/2 - e.clientY);
+        if (dist < 450) node.classList.add('proximity');
+        else node.classList.remove('proximity');
+    });
 
-const splat = document.createElement('div');
-splat.className = 'splat';
-splat.style.left = e.clientX + 'px';
-splat.style.top = e.clientY + 'px';
-document.body.appendChild(splat);
-setTimeout(() => splat.remove(), 1500);
-
-if (!isDown) return;
-const dx = e.clientX - startX;
-const dy = e.clientY - startY;
-env.style.left = (offsetX + dx) + 'px';
-env.style.top = (offsetY + dy) + 'px';
-clampCamera();
-velX = e.clientX - lastX;
-velY = e.clientY - lastY;
-lastX = e.clientX;
-lastY = e.clientY;
-
-nodes.forEach(node => {
-const rect = node.getBoundingClientRect();
-const dist = Math.hypot(rect.left + rect.width/2 - e.clientX, rect.top + rect.height/2 - e.clientY);
-if (dist < 450) node.classList.add('proximity');
-else node.classList.remove('proximity');
+    // Wildlife flight
+    creatures.forEach(creature => {
+        const x = parseFloat(creature.style.left || creature.dataset.x);
+        const y = parseFloat(creature.style.top || creature.dataset.y);
+        const envX = e.clientX - env.offsetLeft;
+        const envY = e.clientY - env.offsetTop;
+        const dist = Math.hypot(x - envX, y - envY);
+        if (dist < 500) {
+            const angle = Math.atan2(y - envY, x - envX);
+            const newX = x + Math.cos(angle) * 6;
+            const newY = y + Math.sin(angle) * 6;
+            creature.style.left = newX + 'px';
+            creature.style.top = newY + 'px';
+            creature.dataset.x = newX;
+            creature.dataset.y = newY;
+        }
+    });
 });
 
-creatures.forEach(creature => {
-const x = parseFloat(creature.style.left || creature.dataset.x);
-const y = parseFloat(creature.style.top || creature.dataset.y);
-const envX = e.clientX - env.offsetLeft;
-const envY = e.clientY - env.offsetTop;
-const dist = Math.hypot(x - envX, y - envY);
-if (dist < 500) {
-const angle = Math.atan2(y - envY, x - envX);
-const newX = x + Math.cos(angle) * 6;
-const newY = y + Math.sin(angle) * 6;
-creature.style.left = newX + 'px';
-creature.style.top = newY + 'px';
-creature.dataset.x = newX;
-creature.dataset.y = newY;
-}
-});
-});
-
+// Text Focus & Boom
 shards.forEach(shard => {
-shard.addEventListener('pointerdown', (e) => {
-e.stopPropagation();
-if (shard.classList.contains('focus-mode')) {
-    shard.classList.remove('focus-mode');
-    shard.classList.add('boom');
-    setTimeout(() => shard.classList.remove('boom'), 500);
-    const rect = shard.getBoundingClientRect();
-    for (let i = 0; i < 20; i++) {
-        setTimeout(() => {
-            const splat = document.createElement('div');
-            splat.className = 'splat';
-            splat.style.left = (rect.left + Math.random() * rect.width) + 'px';
-            splat.style.top = (rect.top + Math.random() * rect.height) + 'px';
-            splat.style.backgroundColor = ['var(--acid)', 'var(--pink)', 'var(--blue)'][Math.floor(Math.random() * 3)];
-            document.body.appendChild(splat);
-            setTimeout(() => splat.remove(), 1500);
-        }, i * 30);
-    }
-} else {
-    shard.classList.add('focus-mode');
-}
-});
+    shard.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        if (shard.classList.contains('focus-mode')) {
+            shard.classList.remove('focus-mode');
+            shard.classList.add('boom');
+            setTimeout(() => shard.classList.remove('boom'), 500);
+            const rect = shard.getBoundingClientRect();
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const splat = document.createElement('div');
+                    splat.className = 'splat';
+                    splat.style.left = (rect.left + Math.random() * rect.width) + 'px';
+                    splat.style.top = (rect.top + Math.random() * rect.height) + 'px';
+                    splat.style.backgroundColor = ['var(--acid)', 'var(--pink)', 'var(--blue)'][Math.floor(Math.random() * 3)];
+                    document.body.appendChild(splat);
+                    setTimeout(() => splat.remove(), 1500);
+                }, i * 30);
+            }
+        } else {
+            shard.classList.add('focus-mode');
+        }
+    });
 });
 
-// CENTRAL CORE RESET (GRAPHIC CONSTRUCTION)
+// Central Core Reset
 document.getElementById('core').addEventListener('pointerdown', (e) => {
-e.stopPropagation();
-document.body.classList.add('glitching');
-creatures.forEach(c => {
-c.style.left = Math.random() * (envWidth - 100) + 'px';
-c.style.top = Math.random() * (envHeight - 100) + 'px';
-c.dataset.x = c.style.left;
-c.dataset.y = c.style.top;
-});
-setTimeout(() => {
-document.body.classList.remove('glitching');
-centerWorld();
-}, 700);
+    e.stopPropagation();
+    document.body.classList.add('glitching');
+    creatures.forEach(c => {
+        c.style.left = Math.random() * (envWidth - 100) + 'px';
+        c.style.top = Math.random() * (envHeight - 100) + 'px';
+        c.dataset.x = c.style.left;
+        c.dataset.y = c.style.top;
+    });
+    setTimeout(() => {
+        document.body.classList.remove('glitching');
+        scale = 1.0; // Reset zoom
+        env.style.transform = "scale(" + scale + ")";
+        centerWorld();
+    }, 700);
 });
 </script>
 </body>
